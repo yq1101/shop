@@ -1,0 +1,169 @@
+{include file="header"}
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 商品管理 <span class="c-gray en">&gt;</span> 分类管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+		
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<div class="text-c">
+					添加：<span id="demo1" value="0">一级分类</span>&nbsp的子类
+					<input type="text" placeholder="分类名称" value="" class="input-text" style="width:120px" id="name">
+					<input type="" hidden="" id="__token__" name="__token__" value="{$Request.token}" />
+					<button type="button" class="btn btn-success" id="add" name=""><i class="Hui-iconfont">&#xe600;</i> 添加</button>
+					<!-- <span id="demo"></span> -->
+			</div>
+			<div class="cl pd-5 bg-1 bk-gray mt-20" id="delall"> <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a></span> <span class="r">共有数据：<strong>54</strong> 条</span> </div>
+			<div class="mt-10">
+			<div id="tree"></div>
+			</div>
+		</article>
+	</div>
+</section>
+<div id="modal-demo9" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content radius">
+				<div class="modal-header">
+						<h3 class="modal-title">修改</h3>
+						<a class="close" data-dismiss="modal" aria-hidden="true" href="javascript:void();">×</a>
+					</div>
+				<div class="modal-body" style="text-align: center;">
+					<input type="" value="" id="up_id" hidden="">
+					修改:<input type="text"  id="up_aaa">
+					<br>
+					<span id="up_demo1">&nbsp</span>
+				</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" onclick="up_action()">确定</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{include file="footer"}
+<script>
+	function getToken() {
+		$.ajax({
+			url:"{:url('common/commonToken')}",
+			dataType:'json',
+			success:function(res){
+				$('#__token__').val(res.token);
+			}
+		})
+	}
+
+	function show() {
+		$.ajax({
+		  		url:"{:url('category/show')}",
+		  		// dataType:'json',
+		  		success:function(res) {
+		  			// console.log(res)
+		  			$("#tree").html(res)
+		  			// $('#ul1 ul').css('display','none')
+		  			
+		  		}
+		  	
+		  })
+	}
+	show()
+
+	$(document).ready(function(){
+		$(document).on('click','#li1',function(){
+		  				pid_html=$(this).html()
+		  				pid=$(this).attr('value')
+		  				new_name=pid_html.split("<")[0]
+		  				// console.log(new_name)
+		  				$("#demo1").html(new_name)
+		  				$("#demo1").attr('value',pid)
+		  				// $(this).next().css('display','block')
+		  				var bool=$(this).next().css('display')
+		  				if (bool=='none') {
+		  					$(this).next().css('display','block')
+		  				}
+		  				if (bool=='block') {
+		  					$(this).next().css('display','none')
+		  				}
+		  			})
+		$("#add").click(function(){
+			var __token__=$('#__token__').val()
+			var name =$('#name').val()
+			var pid =$('#demo1').attr('value')
+				$.ajax({
+					url:'{:url("category/addaction")}',
+					type:'post',
+					data:{
+						pid:pid,
+						name:name,
+						__token__:__token__						
+					},
+					success:function(res) {
+						getToken()
+							if (res.status=='error') {
+									alert('res.data')
+							}else{
+								$("#demo1").attr('value','0')
+	 							$("#demo1").html("一级分类")	
+								$('#name').val('');
+								show()
+							}
+						}
+				})
+
+			})
+
+		});
+
+	function dele(id){
+	 	console.log(id)
+	 	var __token__=$('#__token__').val()
+	 	$.ajax({
+	 		url:'{:url("category/delete")}',
+	 		type:'post',
+	 		data:{
+	 			id:id,
+	 			__token__:__token__,
+	 		},
+	 		dataType:'json',
+	 		success:function(res){
+	 			console.log(res)
+	 			if (res.status=='ok') {
+	 				$("#demo1").attr('value','0')
+	 				$("#demo1").html("一级分类")				
+	 			}else{
+	 				alert(res.data)
+	 			}
+	 			getToken()
+	 			show()	 			
+	 		}
+	 	})
+	 }
+
+	function modaldemo(id){
+		console.log(id)
+		$("#up_id").val(id)
+		$("#modal-demo9").modal("show")	
+	}
+	function up_action(){
+		var id=$("#up_id").val()
+		var name=$("#up_aaa").val()
+		$.ajax({
+			url:'{:url("category/updateaction")}',
+			data:{
+				id:id,
+				name:name
+			},
+			type:'post',
+			success:function(res){
+				if (res.status=='ok') {
+					$('#up_demo1').html('')
+					$("#modal-demo9").modal("hide")
+					show()
+				}else{
+					$('#up_demo1').html(res.data)
+				}
+			}
+		})
+	}
+</script>
+
+</body>
+</html> 

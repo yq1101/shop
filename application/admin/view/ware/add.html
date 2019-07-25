@@ -1,0 +1,115 @@
+{include file="header"}
+
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 商品管理 <span class="c-gray en">&gt;</span> 货品管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+		
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<form action="" method="post" class="form form-horizontal" id="form-admin-role-add">
+				<div class="row cl">
+					<input type="" hidden="" id="__token__" name="__token__" value="{$Request.token}" />
+					
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-3">属性详情：</label>
+					<div class="formControls col-xs-8 col-sm-9">  
+						<dl class="permission-list" id="aa">					
+						</dl>
+						<br>
+						<input type="" hidden="" id="g_id" name="" value="{$g_id}">
+						商品单价<input type=""  id="price" value="">(元)
+						<br>
+						商品库存<input type=""  id="number" value="">(个)
+					</div>
+					<br>
+				<div class="row cl">
+					<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+						<button type="button" class="btn btn-success radius" id="add" name="admin-role-save"><i class="icon-ok"></i> 确定</button>
+					</div>
+				</div>
+			</form>
+		</article>
+	</div>
+</section>
+
+{include file="footer"}
+<script >
+
+	function on(){
+		var g_id=$('#g_id').val()
+
+		$.ajax({
+			url:'{:url("ware/show2")}',
+			data:{
+
+				g_id:g_id
+			},
+			type:'post',
+			dataType:'json',
+			success:function(res){
+				// console.log(res)
+				var data=res.data
+				// console.log(data)
+				var dl=''
+				$.each(data, function( key, value ) {
+					dl=dl+"<dt><label class='' style='color:red'><input type='checkbox' value='' name='user-Character-1-0' id='user-Character-1-0'>"+key+"</label></dt><dd><dl class='cl permission-list2'>"
+					$.each(value, function( key1, value1 ) {
+						dl=dl+"<label class=''><input type='radio' name='myradio"+value1[0]['attr_id']+"' class='myradio' value='"+value1[0]['id']+"'>"+value1[0]['name']+"</label>&nbsp&nbsp&nbsp"
+					})
+					dl=dl+"</dd>";
+				});
+				// console.log(dl)
+				$('#aa').html(dl)
+
+			}
+		})
+	}
+on()
+
+	$(document).ready(function(){
+			$('#add').click(function(){
+				var g_id=$('#g_id').val()
+				// var __token__=$('#__token__').val()
+				var price=$('#price').val()			
+				var number=$('#number').val()
+				var ad_id=$('.myradio:checked')
+				new_arr=[]
+				$('.myradio:checked').each(function () {
+					new_arr.push($(this).val())
+				})
+				console.log(new_arr)
+				// var cc=''
+				// for (var i = 0; i < ad_id.length; i++) {
+				// 	arr.push(ad_id[i].value);
+				// 	cc=arr.join(',');					
+				// }
+				$.ajax({
+					url:"{:url('ware/addAction')}",
+					data:{
+						g_id:g_id,
+						// __token__:__token__,
+						new_arr:new_arr,
+						price:price,
+						number:number
+					},
+					type:'post',
+					// dataType:'json',
+					success:function(res){
+						console.log(res)
+						if (res.status=='ok') {
+							on()
+							alert('添加成功')
+						}else{
+							alert(res.data)
+						}
+						// getToken()
+					}
+				})
+			})
+
+	});	
+	
+</script>
+
+</body>
+</html> 

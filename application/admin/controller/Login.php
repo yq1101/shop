@@ -5,6 +5,7 @@ use Request;
 use Db;
 use think\captcha\Captcha;
 use think\facade\Session;
+use gmars\rbac\Rbac;
 // use gmars\rbac\Rbac;
 class Login extends Controller
 {
@@ -14,6 +15,7 @@ class Login extends Controller
     }
     public function loginAction(){
     	$verify=Request::post('verify');
+        $name=Request::post('name');
     	$name=Request::post('name');
     	$password=Request::post('password');
     	$captcha = new Captcha();
@@ -30,6 +32,8 @@ class Login extends Controller
 				echo json_encode($arr);
 				die;
 			}else{
+                $rbac= new Rbac();
+                $rbac->cachePermission($res['id']);
 				$arr=['code'=>'2','status'=>'ok','message'=>'登陆成功'];
 				session::set("name",$name);
 				$json=json_encode($arr);
@@ -53,7 +57,7 @@ class Login extends Controller
     // }
 
         public function unlink(){
-       	Session::delete('name');
+       	Session::clear();
     	$this->error("❌",'Login/login');
     }
 

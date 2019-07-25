@@ -1,0 +1,286 @@
+{include file="header"}
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 商品管理 <span class="c-gray en">&gt;</span> 品牌管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+		
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<div class="text-c">
+					<input type="text" placeholder="商品名称" value="" class="input-text" style="width:120px" id="g_name">
+					<input type="" hidden="" id="__token__" name="__token__" value="{$Request.token}" />
+					<select name="" id="brand_id">
+						<option value="">商品品牌</option>
+					</select>
+					<select name="" id="category_id">
+						<option></option>
+					</select>
+					<!-- <input type="file" name="file" id="b_logo"> -->
+					<button type="button" class="btn btn-success" id="add" name=""><i class="Hui-iconfont">&#xe600;</i> 添加</button>
+					<span id="demo"></span>
+			</div>
+			<div class="cl pd-5 bg-1 bk-gray mt-20" id="delall"> <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a></span> <span class="r">共有数据：<strong>54</strong> 条</span> </div>
+			<div class="mt-10">
+				<table class="table table-border table-bordered table-bg table-sort">
+					<thead>
+						<tr class="text-c">
+							<th width="25"><input type="checkbox" name="" value=""></th>
+							<th width="25">ID</th>
+							<th width="60">商品名称</th>
+							<th width="60">商品品牌</th>
+							<th width="60">商品分类</th>
+							<th width="70">商品详情</th>
+							<th width="70">商品属性详情</th>
+							<th width="70">生成货品(单品)</th>
+							<th width="25">是否上架</th>
+							<th width="70">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</div>
+</section>
+
+<div id="modal-demo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content radius">
+				<div class="modal-header">
+						<h3 class="modal-title">修改</h3>
+						<a class="close" data-dismiss="modal" aria-hidden="true" href="javascript:void();">×</a>
+					</div>
+				<div class="modal-body" style="text-align: center;">
+					<input type="" value="" id="up_g_id" hidden="">
+					<br>
+					商品名称:<input type="" value="" id="up_g_name">
+					<br>
+					商品品牌:<select name="" id="up_brand_id">
+							<option></option>
+							</select>
+					<br>
+					商品分类:<select name="" id="up_category_id">
+							<option></option>
+							</select>
+					<br>
+					商品状态:<input type="" value="" id="up_is_show">
+					<br>
+					<!-- 品牌图片:<input type="file" name="file" id="up_b_logo">
+					<br> -->
+					<span id="up_demo">&nbsp</span>
+				</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" onclick="up_action()">确定</button>
+				<button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{include file="footer"}
+<script>
+	function getToken(){
+		$.ajax({
+			url:"{:url('common/commonToken')}",
+			dataType:'json',
+			success:function(res){
+				$('#__token__').val(res.token);
+			}
+		})
+	}
+
+	$(document).ready(function(){
+		 $("#add").click(function(){
+		  	var g_name=$('#g_name').val()
+		  	var brand_id=$('#brand_id').val()
+		  	var category_id=$('#category_id').val()
+		  	// var __token__=$('#__token__').val()
+		  	$.ajax({
+		  		url:"{:url('goods/addAction')}",
+		  		data:{
+		  			g_name:g_name,
+		  			brand_id:brand_id,
+		  			category_id:category_id,
+		  		},
+		  		type:'post',
+		  		success:function(res) {
+		  			console.log(res);
+		  			if (res.status=='ok'){
+		  				$("#demo").html("添加成功");
+		  				$("#demo").css("color","green");
+		  				$('#g_name').val('');
+		  				$('#g_desc').val('');
+		  				setTimeout(function(){
+		  					$("#demo").html("");
+		  				},2000);		
+
+		  				show()
+		  			}else{
+		  				$("#demo").html(res.data);
+		  				$("#demo").css("color","red");
+		  				setTimeout(function(){
+		  					$("#demo").html("");
+		  				},2000);
+		  				
+		  			}
+		  			// getToken()
+		  		}
+		  	
+		  })
+	})
+
+	show()
+		  	
+	});
+	function brandselect() {
+		$.ajax({
+			url:"{:url('goods/show1')}",
+			dataType:'json',
+			success:function(res) {
+				// arr=res.data
+				// console.log(res)
+				var option=''
+				for (var i = 0; i < res.length; i++) {
+					
+					option=option+"<option value='"+res[i].brand_id+"'>"+res[i].brand_name+"</option>"
+									
+			}
+			$('#brand_id').html(option);
+			}
+		})
+		
+
+	}
+	brandselect()
+
+	function categoryselect() {
+		$.ajax({
+			url:"{:url('goods/show2')}",
+			success:function(res) {
+				// console.log(res)
+			$('#category_id').html(res);
+			}
+		})		
+	}
+	categoryselect()
+
+	function show(){
+		$.ajax({
+			url:"{:url('goods/show')}",
+			dataType:'json',
+			success:function(res){ 
+				// console.log(res)
+				var tr=''
+		  			for (var i = 0; i < res.length; i++) {
+						// console.log(res)
+						tr=tr+"<tr class='text-c'><td><input name='id[]' type='checkbox' value='"+res[i].g_id+"'></td><td>"+res[i].g_id+"</td><td>"+res[i].g_name+"</td><td value='"+res[i].brand_id+"'>"+res[i].brand_name+"</td><td value='"+res[i].id+"'>"+res[i].name+"</td><td><a href='{:url('goodsimg/list')}?g_id="+res[i].g_id+"'>图片详情</a></td><td><a href='{:url('goodsattr/list')}?g_id="+res[i].g_id+"'>商品属性</a></td><td><a href='{:url('ware/list')}?g_id="+res[i].g_id+"'>货物单品</a></td><td>"+res[i].is_show+"</td><td class='f-14 product-brand-manage'><a style='text-decoration:none' title='编辑' onclick='modaldemo("+res[i].g_id+")'><i class='Hui-iconfont'>&#xe6df;</i></a><a style='text-decoration:none' class='ml-5' title='删除' onclick='dele("+res[i].g_id+")'><i class='Hui-iconfont'>&#xe6e2;</i></a></td></tr>"
+					}
+					$(".table tbody").html(tr);
+			}
+		})
+	}
+show()
+	
+	function dele(g_id){
+		var __token__=$('#__token__').val()
+		$.ajax({
+				url:"{:url('goods/delete')}",
+				data:{
+					id:g_id,
+					__token__:__token__
+				},
+				type:'post',
+				dataType:'json',
+				success:function(res){
+					console.log(res)
+					if (res.status=="ok") {
+						alert("删除成功");					
+						show()
+					}
+					getToken()
+				}
+			})
+	}
+	function modaldemo (id){
+		$.ajax({
+			url:"{:url('goods/show3')}",
+			data:{
+				id:id,
+			},
+			type:'post',
+			dataType:'json',
+			success:function(res){
+				// console.log(res)
+				var goods=res.data
+				var category=res.opo
+				var brand=res.ww
+				brand_option=''
+				category_option=''
+				for (var i = 0; i < brand.length; i++) {
+					var brand_id=brand[i].brand_id
+					var brand_name=brand[i].brand_name
+					if (goods[0].brand_id==brand_id) {
+						brand_option=brand_option+"<option value='"+brand_id+"' selected>"+brand_name+"</option>"
+					}else{
+						brand_option=brand_option+"<option value='"+brand_id+"'>"+brand_name+"</option>"
+					}
+					
+				}
+				for (var i = 0; i < category.length; i++) {
+					var id=category[i].id
+					var name=category[i].name
+					if (goods[0].category_id==id) {
+						category_option=category_option+"<option value='"+id+"' selected>"+name+"</option>"
+					}else{
+						category_option=category_option+"<option value='"+id+"'>"+name+"</option>"
+					}
+					
+				}
+				$('#up_brand_id').html(brand_option)
+				$('#up_category_id').html(category_option)
+				$('#up_g_id').val(goods[0].g_id)
+				$('#up_g_name').val(goods[0].g_name)
+				$('#up_is_show').val(goods[0].is_show)
+				$('#modal-demo').modal('show')
+			}
+		})
+	}
+
+	function up_action(){
+		var g_id=$('#up_g_id').val()
+		var g_name=$('#up_g_name').val()
+		var is_show=$('#up_is_show').val()
+		var category_id=$('#up_category_id').val()
+		var brand_id=$('#up_brand_id').val()
+		$.ajax({
+			url:"{:url('goods/updateAction')}",
+			data:{
+				g_id:g_id,
+				g_name:g_name,
+				is_show:is_show,
+				category_id:category_id,
+				brand_id:brand_id
+			},
+			type:'post',
+			dataType:'json',
+			success:function(res){
+				
+				if (res.status=='ok') {
+					$('#modal-demo').modal("hide")
+					alert('修改成功')
+					show()
+				}
+				if (res.status=='error') {
+					$('#up_demo').modal(res.data)
+				}
+			}
+		})
+	}
+
+
+
+	
+</script>
+
+</body>
+</html> 

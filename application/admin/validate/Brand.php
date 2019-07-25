@@ -4,7 +4,7 @@ namespace app\admin\validate;
 
 use think\Validate;
 
-class Permissioncate2 extends Validate
+class Brand extends Validate
 {
     /**
      * 定义验证规则
@@ -13,7 +13,9 @@ class Permissioncate2 extends Validate
      * @var array
      */ 
     protected $rule = [
-          => 'require|max:50|min:1|token',
+        'b_name'  => 'require|max:50|min:1|token',
+        'b_description'   => 'require|max:100|min:1',
+        'b_file' => 'file',
     ];
     
 
